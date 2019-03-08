@@ -1,17 +1,16 @@
 import React from 'react';
-import {Pokemon} from './Pokemon';
+import { Pokemon } from './Pokemon';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
 const POKEMONS_PER_PAGE = 12;
-
-
 
 export class Page extends React.Component {
   state = {
     pokemons: {},
     count: 100,
     loading: false,
+    countCachedPokemons: 0,
   }
 
   fetchPokemons = (page) => {    
@@ -44,13 +43,16 @@ export class Page extends React.Component {
 
   componentDidMount() {
     const { match } = this.props;
-    const currentPage = +match.params.currentPage;
 
+    const currentPage = +match.params.currentPage;
+    // console.log('componentDidMount');
     this.fetchPokemons(currentPage);
+    const { countCachedPokemons = 0 } = this.props.location.state;
+    this.setState({ countCachedPokemons });
   }
 
-  componentDidUpdate(prevProps) {
-    console.log('componentDidUpdate');
+  componentDidUpdate(prevProps, prevState) {
+    // console.log('componentDidUpdate');
     const { currentPage } = this.props.match.params;
     const { currentPage: prevCurrentPage } = prevProps.match.params;
 
@@ -67,12 +69,13 @@ export class Page extends React.Component {
           ...prevState.pokemons[id],
           catched: true
         }
-      }
+      },
+      countCachedPokemons: prevState.countCachedPokemons + 1,
     }))
   }
 
   render() {
-    const { count, loading, pokemons } = this.state;
+    const { count, loading, pokemons, countCachedPokemons } = this.state;
     const { match } = this.props;
 
     const currentPage = +match.params.currentPage;
@@ -81,11 +84,13 @@ export class Page extends React.Component {
     const startId = POKEMONS_PER_PAGE * (currentPage - 1) + 1;
     const endId = startId + POKEMONS_PER_PAGE;
     const list = _.range(startId, endId).map(id => pokemons[id]);
-    console.log(_.range(startId, endId));
+    // console.log(_.range(startId, endId));
         
     return (
       <div>
+        <p className="text-center">Catched Pokemons: {countCachedPokemons}</p>
         <div className="wrapper">
+          
           {loading
             ? <div>Loading</div>
             : list.map(pokemon => pokemon && (
@@ -95,11 +100,12 @@ export class Page extends React.Component {
                 id={pokemon.id}
                 catchPokemon={this.catchPokemon}
                 catched={pokemon.catched}
+                countCachedPokemons={countCachedPokemons}
               />)
             )
           }
         </div>
-        <div>
+        <div className="navigation">
           {currentPage > 1 && <Link to={`/pokemons/${currentPage - 1}`}>← {currentPage - 1}</Link>}
           <span>{currentPage}</span>
           {currentPage < pages && <Link to={`/pokemons/${currentPage + 1}`}>{currentPage + 1} →</Link>}

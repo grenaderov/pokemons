@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import { BrowserRouter, Route } from "react-router-dom";
+import { LastLocationProvider } from "react-router-last-location";
 import { Page } from './components/Page';
+import { PageDetail } from './components/PageDetail';
 
 // https://pokeapi.co/
 
@@ -20,19 +22,26 @@ class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <div>
-          <h1>Pokemons Catalog</h1>
-          <Route
-            path="/" 
-            exact
-            component={(props) => <div>HomePage</div>}
-          />
-          <Route
-            path="/pokemons/:currentPage" 
-            exact
-            component={Page}
-          />
-        </div>
+        <LastLocationProvider>
+         <div>
+           <h1 className="text-center">Pokemons Catalog</h1>
+            <Route
+             path="/" 
+             exact
+             component={(props) => <div>HomePage</div>}
+           />
+           <Route
+             path="/pokemons/:currentPage" 
+             exact
+             component={Page}
+            />
+            <Route
+             path="/pokemon/:pokemonId" 
+             exact
+             component={PageDetail}
+            />
+          </div>
+        </LastLocationProvider>
       </BrowserRouter>
     );
   }

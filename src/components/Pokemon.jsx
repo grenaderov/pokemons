@@ -1,12 +1,19 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
-export const Pokemon = ({id, name, catchPokemon, catched}) => {
+export const Pokemon = ({id, name, catchPokemon, catched, countCachedPokemons}) => {
   const className = !catched ? "pokemon" : "pokemon pokemon_catched";
 
   return (
-    <div className={className} onClick={() => catchPokemon(id)}>
+    <div className={className}>
+      <Link to={{
+        pathname: `/pokemon/${id}`,
+        state: { countCachedPokemons }
+        }}>
         <h2>#{id} {name}</h2>
-        <img src={`https://raw.githubusercontent.com/epam-js-may-2018/homework-7-js/master/pokemons/${id}.png`} />
+        <img src={`https://raw.githubusercontent.com/epam-js-may-2018/homework-7-js/master/pokemons/${id}.png`} alt=""/>
+      </Link>
+      <button onClick={() => catchPokemon(id)}>Поймать</button>
     </div>
   )
 };
