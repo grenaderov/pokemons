@@ -47,7 +47,7 @@ export class Page extends React.Component {
     const currentPage = +match.params.currentPage;
     // console.log('componentDidMount');
     this.fetchPokemons(currentPage);
-    const { countCachedPokemons = 0 } = this.props.location.state;
+    const { countCachedPokemons = 0 } = this.props.location.state || 0;
     this.setState({ countCachedPokemons });
   }
 
