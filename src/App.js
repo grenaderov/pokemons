@@ -1,48 +1,59 @@
 import React, { Component } from 'react';
+import { Provider } from 'react-redux';
 import { BrowserRouter, Route } from "react-router-dom";
 import { LastLocationProvider } from "react-router-last-location";
 import { Page } from './components/Page';
 import { PageDetail } from './components/PageDetail';
+import {store} from './store';
 
 // https://pokeapi.co/
 
+// git add .
+// git commit -m 'commit message'
 
-// function RoutePage(props) {
-//   return (
-//     <Page
-//       list={list}
-//       pages={Math.floor(count / POKEMONS_PER_PAGE)}
-//       match={props.match}
-//       fetchPokemons={this.fetchPokemons}
-//     />
-//   );
-// }
+// git commit -am 'commit message'
+
+// Каталог
+// кол-во покемонов на странице (селект)
+// вывод этих покемонов
+// ссылки на каждого покемона, кнопка поймать
+
+// Страница покемона
+// поймать
+// информация
+
+// State
+// count pages
+// loading
+// catalog: { [id]: { ... } } // list
+// pokemons: { [id]: { ... } } // details
+// catched : { [id]: true }
 
 class App extends Component {
   render() {
     return (
-      <BrowserRouter>
-        <LastLocationProvider>
-         <div>
-           <h1 className="text-center">Pokemons Catalog</h1>
+      <Provider store={store}>
+        <BrowserRouter>
+          <div>
+            <h1 className="text-center">Pokemons Catalog</h1>
             <Route
-             path="/" 
-             exact
-             component={(props) => <div>HomePage</div>}
-           />
-           <Route
-             path="/pokemons/:currentPage" 
-             exact
-             component={Page}
+              path="/" 
+              exact
+              component={(props) => <div>HomePage</div>}
             />
             <Route
-             path="/pokemon/:pokemonId" 
-             exact
-             component={PageDetail}
+              path="/pokemons/:currentPage" 
+              exact
+              component={Page}
+            />
+            <Route
+              path="/pokemon/:pokemonId" 
+              exact
+              component={PageDetail}
             />
           </div>
-        </LastLocationProvider>
-      </BrowserRouter>
+        </BrowserRouter>
+      </Provider>
     );
   }
 }

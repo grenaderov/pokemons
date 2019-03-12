@@ -15,10 +15,6 @@ export class PageDetail extends React.Component {
     
     const { countCachedPokemons = 0 } = this.props.location.state;
     this.setState({ countCachedPokemons });
-
-    // this.getPokemonDetail(1);
-    // this.getPokemonDetail(2);
-    // this.getPokemonDetail(3);
     this.getPokemonDetail(pokemonId);
   }
 

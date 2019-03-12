@@ -1,29 +1,29 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Pokemon } from './Pokemon';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
+import { catchPokemon } from '../actions/catched';
+import { fetchPokemonsSuccess } from '../actions/catalog';
 
 const POKEMONS_PER_PAGE = 12;
 
-export class Page extends React.Component {
+class Page0 extends React.Component {
   state = {
-    pokemons: {},
-    count: 100,
     loading: false,
-    countCachedPokemons: 0,
   }
 
-  fetchPokemons = (page) => {    
+  fetchPokemons = (page) => {
+    const { catalog } = this.props;
     const offset = POKEMONS_PER_PAGE * (page - 1);
     const fetchingIds = _.range(offset + 1, offset + POKEMONS_PER_PAGE + 1);
-    const { pokemons } = this.state;
 
-    if (fetchingIds.every(id => pokemons[id])) return;
+    if (fetchingIds.every(id => catalog[id])) return;
 
     const url = `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${POKEMONS_PER_PAGE}`
 
     this.setState({ loading: true });
-
+    // this.props.handleFetchPokemonsStart
     setTimeout(() =>
       fetch(url)
         .then(res => res.json())
@@ -33,11 +33,10 @@ export class Page extends React.Component {
             return ({...acc, [id]: { ...pokemon, id }});
           }, {});
 
-          this.setState(({pokemons}) => ({
-            pokemons: { ...pokemons, ...fetchedPokemons },
-            loading: false
-          }))
-        }),
+          this.props.handleFetchPokemonsSuccess(fetchedPokemons);
+
+          this.setState({ loading: false })})
+          .catch(err => this.props.handleFetchPokemonsFailure()),
       1000);
   }
 
@@ -45,14 +44,10 @@ export class Page extends React.Component {
     const { match } = this.props;
 
     const currentPage = +match.params.currentPage;
-    // console.log('componentDidMount');
     this.fetchPokemons(currentPage);
-    const { countCachedPokemons = 0 } = this.props.location.state || 0;
-    this.setState({ countCachedPokemons });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // console.log('componentDidUpdate');
     const { currentPage } = this.props.match.params;
     const { currentPage: prevCurrentPage } = prevProps.match.params;
 
@@ -61,34 +56,21 @@ export class Page extends React.Component {
     }
   }
 
-  catchPokemon = (id) => {
-    this.setState((prevState) => ({
-      pokemons: {
-        ...prevState.pokemons,
-        [id]: {
-          ...prevState.pokemons[id],
-          catched: true
-        }
-      },
-      countCachedPokemons: prevState.countCachedPokemons + 1,
-    }))
-  }
-
   render() {
-    const { count, loading, pokemons, countCachedPokemons } = this.state;
-    const { match } = this.props;
+    const { loading } = this.state;
+    const { match, catalog, catched, totalPages } = this.props;
 
     const currentPage = +match.params.currentPage;
-    const pages = Math.floor(count / POKEMONS_PER_PAGE);
+    const pages = Math.floor(totalPages / POKEMONS_PER_PAGE);
 
     const startId = POKEMONS_PER_PAGE * (currentPage - 1) + 1;
     const endId = startId + POKEMONS_PER_PAGE;
-    const list = _.range(startId, endId).map(id => pokemons[id]);
+    const list = _.range(startId, endId).map(id => catalog[id]);
     // console.log(_.range(startId, endId));
         
     return (
       <div>
-        <p className="text-center">Catched Pokemons: {countCachedPokemons}</p>
+        <p className="text-center">Catched Pokemons: {Object.values(catched).filter(Boolean).length}</p>
         <div className="wrapper">
           
           {loading
@@ -98,9 +80,9 @@ export class Page extends React.Component {
                 key={pokemon.id}
                 name={pokemon.name}
                 id={pokemon.id}
-                catchPokemon={this.catchPokemon}
-                catched={pokemon.catched}
-                countCachedPokemons={countCachedPokemons}
+                catchPokemon={this.props.handleCatchPokemon}
+                catched={catched[pokemon.id]}
+                // countCachedPokemons={countCachedPokemons}
               />)
             )
           }
@@ -114,3 +96,12 @@ export class Page extends React.Component {
     );
   }
 }
+
+const mapStateToProps = ({ catched, catalog, totalPages }) =>  ({ catched, catalog, totalPages });
+const mapDispatchToProps = dispatch => ({
+  handleCatchPokemon: (id) => dispatch(catchPokemon(id)),
+  handleFetchPokemonsSuccess: (pokemons) => dispatch(fetchPokemonsSuccess(pokemons))
+})
+
+
+export const Page = connect(mapStateToProps, mapDispatchToProps)(Page0);
