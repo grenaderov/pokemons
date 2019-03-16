@@ -1,20 +1,19 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { useLastLocation } from 'react-router-last-location';
 
-export const PokemonDetail = ({detail: {name, base_experience, height, weight}, id, countCachedPokemons}) => {
-  const { pathname = '/pokemons/1' } = useLastLocation() || {};
+export const PokemonDetail = ({detail: {name, base_experience, height, weight}, id, catchPokemon, catched}) => {
+  const className = !catched ? "pokemon" : "pokemon pokemon_catched";
+  
   return (
     <div className="pokemon-detail">
-    <Link to={{
-  pathname,
-  state: { countCachedPokemons }
- }}>Back to catalog</Link>
+    <Link to={`/pokemons/1`}>Back to catalog</Link>
         <h2>#{id} {name}</h2>
+        <button onClick={() => catchPokemon(id)}>Поймать</button> &nbsp;
+        <button onClick={() => catchPokemon(id, false)}>Отпустить</button>
         <p>Рост: {height}<br/>
           Вес: {weight}<br/>
           Базовый опыт за победу над ним: {base_experience}</p>
-        <img src={`https://raw.githubusercontent.com/epam-js-may-2018/homework-7-js/master/pokemons/${id}.png`} alt=""/>
+        <img className={className} src={`https://raw.githubusercontent.com/epam-js-may-2018/homework-7-js/master/pokemons/${id}.png`} alt=""/>
     </div>
   )
 };

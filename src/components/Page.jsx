@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import _ from 'lodash';
 import { catchPokemon } from '../actions/catched';
 import { fetchPokemonsSuccess } from '../actions/catalog';
+import { addTotal } from '../actions/addTotal';
 
 const POKEMONS_PER_PAGE = 12;
 
@@ -23,7 +24,7 @@ class Page0 extends React.Component {
     const url = `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${POKEMONS_PER_PAGE}`
 
     this.setState({ loading: true });
-    // this.props.handleFetchPokemonsStart
+    
     setTimeout(() =>
       fetch(url)
         .then(res => res.json())
@@ -34,9 +35,10 @@ class Page0 extends React.Component {
           }, {});
 
           this.props.handleFetchPokemonsSuccess(fetchedPokemons);
+          this.props.handleAddTotal(+data.count);
 
           this.setState({ loading: false })})
-          .catch(err => this.props.handleFetchPokemonsFailure()),
+          .catch(err => this.props.handleFetchPokemonsFailure(err)),
       1000);
   }
 
@@ -47,7 +49,7 @@ class Page0 extends React.Component {
     this.fetchPokemons(currentPage);
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { currentPage } = this.props.match.params;
     const { currentPage: prevCurrentPage } = prevProps.match.params;
 
@@ -59,15 +61,13 @@ class Page0 extends React.Component {
   render() {
     const { loading } = this.state;
     const { match, catalog, catched, totalPages } = this.props;
-
     const currentPage = +match.params.currentPage;
     const pages = Math.floor(totalPages / POKEMONS_PER_PAGE);
 
     const startId = POKEMONS_PER_PAGE * (currentPage - 1) + 1;
     const endId = startId + POKEMONS_PER_PAGE;
     const list = _.range(startId, endId).map(id => catalog[id]);
-    // console.log(_.range(startId, endId));
-        
+       
     return (
       <div>
         <p className="text-center">Catched Pokemons: {Object.values(catched).filter(Boolean).length}</p>
@@ -82,7 +82,6 @@ class Page0 extends React.Component {
                 id={pokemon.id}
                 catchPokemon={this.props.handleCatchPokemon}
                 catched={catched[pokemon.id]}
-                // countCachedPokemons={countCachedPokemons}
               />)
             )
           }
@@ -99,9 +98,10 @@ class Page0 extends React.Component {
 
 const mapStateToProps = ({ catched, catalog, totalPages }) =>  ({ catched, catalog, totalPages });
 const mapDispatchToProps = dispatch => ({
-  handleCatchPokemon: (id) => dispatch(catchPokemon(id)),
-  handleFetchPokemonsSuccess: (pokemons) => dispatch(fetchPokemonsSuccess(pokemons))
+  handleCatchPokemon: (id, ...args) => dispatch(catchPokemon(id, ...args)),
+  handleFetchPokemonsSuccess: (pokemons) => dispatch(fetchPokemonsSuccess(pokemons)),
+  handleAddTotal: (total) => dispatch(addTotal(total)),
+  handleFetchPokemonsFailure: (err) => console.log('Error: ' + err)
 })
-
 
 export const Page = connect(mapStateToProps, mapDispatchToProps)(Page0);

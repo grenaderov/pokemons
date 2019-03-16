@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter, Route } from "react-router-dom";
-import { LastLocationProvider } from "react-router-last-location";
 import { Page } from './components/Page';
 import { PageDetail } from './components/PageDetail';
 import {store} from './store';
