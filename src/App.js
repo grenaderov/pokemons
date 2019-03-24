@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import { Provider } from 'react-redux';
+import React, { Component } from "react";
+import { Provider } from "react-redux";
 import { BrowserRouter, Route } from "react-router-dom";
-import { Page } from './components/Page';
-import { PageDetail } from './components/PageDetail';
-import {store} from './store';
+import { Page } from "./modules/CatalogPage/Page";
+import { PokemonPage } from "./modules/PokemonPage/PokemonPage";
+import { store } from "./store";
 
 // https://pokeapi.co/
 
@@ -35,21 +35,9 @@ class App extends Component {
         <BrowserRouter>
           <div>
             <h1 className="text-center">Pokemons Catalog</h1>
-            <Route
-              path="/" 
-              exact
-              component={(props) => <div>HomePage</div>}
-            />
-            <Route
-              path="/pokemons/:currentPage" 
-              exact
-              component={Page}
-            />
-            <Route
-              path="/pokemon/:pokemonId" 
-              exact
-              component={PageDetail}
-            />
+            <Route path="/" exact component={props => <div>HomePage</div>} />
+            <Route path="/pokemons/:currentPage" exact component={Page} />
+            <Route path="/pokemon/:pokemonId" exact component={PokemonPage} />
           </div>
         </BrowserRouter>
       </Provider>
@@ -58,6 +46,5 @@ class App extends Component {
 }
 
 export default App;
-
 
 //  https://reacttraining.com/react-router/web/guides/quick-start
